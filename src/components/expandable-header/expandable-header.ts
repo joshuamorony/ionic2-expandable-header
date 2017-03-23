@@ -1,4 +1,5 @@
-import { Component, Input, ElementRef, Renderer } from '@angular/core';
+import { Component, Input, ElementRef, Renderer, ContentChildren } from '@angular/core';
+import { Item } from 'ionic-angular';
 
 @Component({
   selector: 'expandable-header',
@@ -9,13 +10,15 @@ export class ExpandableHeader {
   @Input('scrollArea') scrollArea: any;
   @Input('headerHeight') headerHeight: number;
 
+  @ContentChildren(Item, {read: ElementRef}) children: any;
+
   newHeaderHeight: any;
 
   constructor(public element: ElementRef, public renderer: Renderer) {
 
   }
 
-  ngOnInit(){
+  ngAfterViewInit(){
 
     this.renderer.setElementStyle(this.element.nativeElement, 'height', this.headerHeight + 'px');
 
@@ -37,8 +40,9 @@ export class ExpandableHeader {
 
       this.renderer.setElementStyle(this.element.nativeElement, 'height', this.newHeaderHeight + 'px');
 
-      for(let headerElement of this.element.nativeElement.children){
+      this.children.forEach((child) => {
 
+        let headerElement = child.nativeElement;
         let totalHeight = headerElement.offsetTop + headerElement.clientHeight;
  
         if(totalHeight > this.newHeaderHeight && !headerElement.isHidden){
@@ -48,8 +52,8 @@ export class ExpandableHeader {
           headerElement.isHidden = false;
           this.renderer.setElementStyle(headerElement, 'opacity', '0.7');
         }
-  
-      }
+
+      });
 
     });
 
